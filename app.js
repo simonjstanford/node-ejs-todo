@@ -26,9 +26,14 @@ app.get("/", function(req, res) {
 });
 
 app.post("/", function(req, res) {
-  let newItem = req.body.newTodo;
-  todoItems.push(newItem);
-  res.redirect("/");
+  let newItemName = req.body.newTodo;
+  let newItem = persistence.createItem(newItemName);
+  persistence.addItems(newItem, () => res.redirect("/"));
+});
+
+app.post("/delete", function(req, res) {
+  let newItemId = req.body.button;
+  persistence.removeItem(newItemId, () => res.redirect("/"));
 });
 
 app.get("/work", function(req, res) {
@@ -46,5 +51,5 @@ app.get("/about", function(req, res) {
 });
 
 app.listen(process.env.PORT || 3000, function() {
-  console.log("Server started on port" + process.env.PORT || 3000);
+  console.log("Server started on port " + (process.env.PORT || 3000));
 })

@@ -6,15 +6,20 @@
 
 <div class="box">
   <% for (i = 0; i < items.length; i++) { %>
-    <div class="item">
-      <input type="checkbox">
-      <p><%= items[i].name %></p>
-    </div>
+      <div class="item">
+        <form class="" action="/done" method="post">
+          <input type="checkbox" name="checkbox" value="<%= items[i]._id %>" onchange="this.form.submit()">
+        </form>
+        <p><%= items[i].name %></p>
+        <form class="delete" action="/delete" method="post">
+          <button type="submit" class="delete" name="button" value="<%= items[i]._id %>"><i class="far fa-trash-alt"></i></button>
+        </form>
+      </div>
   <% } %>
 
   <form class="item" action="<%= postAction %>" method="post">
     <input type="text" name="newTodo" placeholder="New Item" autocomplete="off">
-    <button type="submit" name="button">+</button>
+    <button type="submit" class="add" name="button">+</button>
   </form>
 </div>
 

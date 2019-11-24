@@ -27,6 +27,7 @@ h1 {
   min-height: 70px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   border-bottom: 1px solid #F1F1F1;
 }
 
@@ -49,14 +50,20 @@ p {
   font-size: 20px;
   font-weight: 200;
   color: #00204a;
+  width: 100%;
 }
 
-form {
+form.item {
   text-align: center;
   margin-left: 20px;
 }
 
-button {
+form.delete {
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+button.add {
   min-height: 50px;
   width: 50px;
   border-radius: 50%;
@@ -66,6 +73,16 @@ button {
   font-size: 30px;
   padding-bottom: 6px;
   border-width: 0;
+}
+
+button.delete {
+  background: none;
+	color: lightgray;
+	border: none;
+	padding: 0;
+	font: inherit;
+	cursor: pointer;
+	outline: inherit;
 }
 
 input[type="text"] {
