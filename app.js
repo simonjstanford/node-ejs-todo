@@ -2,7 +2,6 @@ require('dotenv').config();
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
-const date = require(__dirname + "/date.js");
 const persistence = require("./persistence.js");
 
 const app = express();
@@ -14,14 +13,35 @@ let workTodoItems = [];
 
 let item1 = persistence.createItem("Welcome to your todo list!");
 let item2 = persistence.createItem("Hit the + button to add a new item.");
-let item3 = persistence.createItem("<-- Hit this to delete an item.");
-let defaults = [item1, item2, item3];
+let item3 = persistence.createItem("<-- Hit this to mark as done.");
+let item4 = persistence.createItem("Hit the bin to delete an item.");
+let defaults = [item1, item2, item3, item4];
 
 app.get("/", function(req, res) {
   persistence.getItems(defaults, (todoItems) => {
-    let today = new Date();
-    let currentDay = date.getDate();
-    res.render("list", { listTitle: currentDay, items: todoItems, postAction: "/"});
+    let todo = {
+      listTitle: "To Do",
+      items: todoItems.filter(item => !item.done),
+      type: "todo",
+      canMarkAsDone: true
+    }
+
+    let done = {
+      listTitle: "Done",
+      items: todoItems.filter(item => item.done),
+      type: "done",
+      canMarkAsDone: false
+    }
+
+    console.log(todoItems);
+
+    let lists = [todo];
+
+    if (done.items.length > 0) {
+      lists.push(done);
+    }
+
+    res.render("list", { lists: lists, postAction: "/"});
   });
 });
 
@@ -29,6 +49,11 @@ app.post("/", function(req, res) {
   let newItemName = req.body.newTodo;
   let newItem = persistence.createItem(newItemName);
   persistence.addItems(newItem, () => res.redirect("/"));
+});
+
+app.post("/done", function(req, res) {
+  let newItemId = req.body.checkbox;
+  persistence.markAsDone(newItemId, () => res.redirect("/"));
 });
 
 app.post("/delete", function(req, res) {

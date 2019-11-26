@@ -4,7 +4,8 @@ const url = process.env.DB_CONNECTION;
 var Schema = mongoose.Schema;
 
 const itemSchema = Schema({
-  name: String
+  name: String,
+  done: Boolean
 });
 
 const Item = mongoose.model("Item", itemSchema);
@@ -56,6 +57,16 @@ function getItems(defaults, callback) {
       callback(items);
       closeConnection(err);
     }
+  });
+};
+
+exports.markAsDone = function(itemId, callback) {
+  openConnection();
+  console.log("Marking item as done: " + itemId);
+
+  Item.findOneAndUpdate({_id: itemId}, {done: true}, {useFindAndModifyOption: false}, (err) => {
+    closeConnection(err);
+    callback();
   });
 };
 
