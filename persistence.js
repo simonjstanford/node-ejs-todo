@@ -8,10 +8,20 @@ const itemSchema = Schema({
   done: Boolean
 });
 
+const listSchema = Schema({
+  name: String,
+  items: [itemSchema]
+});
+
 const Item = mongoose.model("Item", itemSchema);
+const List = mongoose.model("List", listSchema);
 
 exports.createItem = function(name) {
   return new Item({name: name});
+};
+
+exports.createList = function(name, items) {
+  return new List({name: name, items: items});
 };
 
 exports.getItems = getItems;
@@ -78,6 +88,29 @@ exports.removeItem = function(itemId, callback) {
   Item.findByIdAndRemove(itemId, (err) => {
     closeConnection(err);
     callback();
+  });
+};
+
+exports.addList = function(list, callback) {
+  openConnection();
+
+  List.findOne({name: list.name}, function(err, foundList) {
+    if (err) {
+      console.log(err);
+      closeConnection(err);
+      callback();
+    } else {
+      if (!foundList) {
+        console.log("Can't find the list, adding it: " + list.name)
+        list.save((err) => {
+          closeConnection(err);
+          callback(list);
+        });
+      } else {
+        console.log("List found: " + foundList.name)
+        callback(foundList);
+      }
+    }
   });
 };
 

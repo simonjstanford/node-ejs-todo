@@ -9,8 +9,6 @@ app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static("public"));
 
-let workTodoItems = [];
-
 let item1 = persistence.createItem("Welcome to your todo list!");
 let item2 = persistence.createItem("Hit the + button to add a new item.");
 let item3 = persistence.createItem("<-- Hit this to mark as done.");
@@ -32,8 +30,6 @@ app.get("/", function(req, res) {
       type: "done",
       canMarkAsDone: false
     }
-
-    console.log(todoItems);
 
     let lists = [todo];
 
@@ -61,14 +57,10 @@ app.post("/delete", function(req, res) {
   persistence.removeItem(newItemId, () => res.redirect("/"));
 });
 
-app.get("/work", function(req, res) {
-  res.render("list", { listTitle: "Work List", items: workTodoItems, postAction: "work"});
-});
-
-app.post("/work", function(req, res) {
-  let newItem = req.body.newTodo;
-  workTodoItems.push(newItem);
-  res.redirect("/work");
+app.get("/:customListName", function(req, res) {
+  let listName = req.params.customListName;
+  let list = persistence.createList(listName, defaults);
+  persistence.addList(list, (addedList) => res.render("list", { lists: [addedList], postAction: "/"}));
 });
 
 app.get("/about", function(req, res) {
