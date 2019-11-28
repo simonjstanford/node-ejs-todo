@@ -1,21 +1,18 @@
 <%- include("header") -%>
 
 <div class="container">
-  <% lists.forEach(function(list) { %>
   <div class="list">
-    <div id="heading" class="<%= list.type %>">
-      <h1><%= list.listTitle %></h1>
+    <div id="heading" class="todo">
+      <h1><%= todoList.name %></h1>
     </div>
 
-    <% list.items.forEach(function(item) { %>
+    <% todoList.items.forEach(function(item) { %>
         <div class="row">
           <div class="col-lg-3 col-md-1 col-sm-0"></div>
           <div class="col-lg-6 col-md-10 col-sm-12 item">
-            <% if (list.canMarkAsDone) { %>
-              <form class="" action="/done" method="post">
-                <input type="checkbox" name="checkbox" value="<%= item._id %>" onchange="this.form.submit()">
-              </form>
-            <% } %>
+            <form class="" action="/done" method="post">
+              <input type="checkbox" name="checkbox" value="<%= item._id %>" onchange="this.form.submit()">
+            </form>
             <p><%= item.name %></p>
             <form class="delete" action="/delete" method="post">
               <button type="submit" class="btn-no-outline delete" name="button" value="<%= item._id %>"><i class="far fa-trash-alt"></i></button>
@@ -25,7 +22,27 @@
         </div>
     <% }); %>
   </div>
-  <% }); %>
+
+  <% if(doneList && doneList.items.length > 0) {%>
+  <div class="list">
+    <div id="heading" class="done">
+      <h1>Done</h1>
+    </div>
+
+    <% doneList.items.forEach(function(item) { %>
+        <div class="row">
+          <div class="col-lg-3 col-md-1 col-sm-0"></div>
+          <div class="col-lg-6 col-md-10 col-sm-12 item">
+            <p><%= item.name %></p>
+            <form class="delete" action="/delete" method="post">
+              <button type="submit" class="btn-no-outline delete" name="button" value="<%= item._id %>"><i class="far fa-trash-alt"></i></button>
+            </form>
+          </div>
+          <div class="col-lg-3 col-md-1 col-sm-0"></div>
+        </div>
+    <% }); %>
+  </div>
+  <% } %>
 
   <div class="row">
     <div class="col-lg-3 col-md-1 col-sm-0"></div>

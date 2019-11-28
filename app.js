@@ -18,26 +18,16 @@ let defaults = [item1, item2, item3, item4];
 app.get("/", function(req, res) {
   persistence.getItems(defaults, (todoItems) => {
     let todo = {
-      listTitle: "To Do",
+      name: "To Do",
       items: todoItems.filter(item => !item.done),
-      type: "todo",
-      canMarkAsDone: true
     }
 
     let done = {
-      listTitle: "Done",
+      name: "Done",
       items: todoItems.filter(item => item.done),
-      type: "done",
-      canMarkAsDone: false
     }
 
-    let lists = [todo];
-
-    if (done.items.length > 0) {
-      lists.push(done);
-    }
-
-    res.render("list", { lists: lists, postAction: "/"});
+    res.render("list", { todoList: todo, doneList: done, postAction: "/"});
   });
 });
 
@@ -57,10 +47,21 @@ app.post("/delete", function(req, res) {
   persistence.removeItem(newItemId, () => res.redirect("/"));
 });
 
-app.get("/:customListName", function(req, res) {
+app.get("/lists/:customListName", function(req, res) {
   let listName = req.params.customListName;
   let list = persistence.createList(listName, defaults);
-  persistence.addList(list, (addedList) => res.render("list", { lists: [addedList], postAction: "/"}));
+  persistence.addList(list, function(addedList) { 
+    res.render("list", { todoList: addedList, doneList:undefined, postAction: "/lists/" + listName})
+  });
+});
+
+app.post("/lists/:customListName", function(req, res) {
+  let listName = req.params.customListName;
+  let newItemName = req.body.newTodo;  
+  let newItem = persistence.createItem(newItemName);
+  persistence.addItemToList(listName, newItem, function() {
+     res.redirect("/lists/" + listName)
+  });
 });
 
 app.get("/about", function(req, res) {

@@ -33,8 +33,10 @@ function getItems(defaults, callback) {
     if (!items || items.length === 0) {
       Item.insertMany(defaults, (err) => getItems(defaults, callback));
     } else {
-      callback(items);
-      closeConnection(err);
+      if (err) {
+        console.log(err)
+      }
+      mongoose.connection.close(() => callback(items));
     }
   });
 };
@@ -46,13 +48,17 @@ exports.addItems = function(items, callback) {
 
   if (Array.isArray(items)) {
     Item.insertMany(items, (err) => {
-      closeConnection(err);
-      callback();
+      if (err) {
+        console.log(err)
+      }
+      mongoose.connection.close(() => callback());
     });
   } else {
     items.save((err) => {
-      closeConnection(err);
-      callback();
+      if (err) {
+        console.log(err)
+      }
+      mongoose.connection.close(() => callback());
     });
   }
 };
@@ -64,8 +70,10 @@ function getItems(defaults, callback) {
     if (!items || items.length === 0) {
       Item.insertMany(defaults, (err) => getItems(defaults, callback));
     } else {
-      callback(items);
-      closeConnection(err);
+      if (err) {
+        console.log(err)
+      }
+      mongoose.connection.close(() => callback(items));
     }
   });
 };
@@ -75,8 +83,10 @@ exports.markAsDone = function(itemId, callback) {
   console.log("Marking item as done: " + itemId);
 
   Item.findOneAndUpdate({_id: itemId}, {done: true}, {useFindAndModifyOption: false}, (err) => {
-    closeConnection(err);
-    callback();
+    if (err) {
+      console.log(err)
+    }
+    mongoose.connection.close(() => callback());
   });
 };
 
@@ -86,41 +96,49 @@ exports.removeItem = function(itemId, callback) {
   console.log(itemId);
 
   Item.findByIdAndRemove(itemId, (err) => {
-    closeConnection(err);
-    callback();
+    if (err) {
+      console.log(err)
+    }
+    mongoose.connection.close(() => callback());
   });
 };
 
 exports.addList = function(list, callback) {
   openConnection();
 
-  List.findOne({name: list.name}, function(err, foundList) {
+  List.findOne({name: list.name}).lean().exec(function(err, foundList) {
     if (err) {
       console.log(err);
-      closeConnection(err);
-      callback();
+      mongoose.connection.close(() => callback());
     } else {
       if (!foundList) {
         console.log("Can't find the list, adding it: " + list.name)
         list.save((err) => {
-          closeConnection(err);
-          callback(list);
+          mongoose.connection.close(() => callback(list));
         });
       } else {
         console.log("List found: " + foundList.name)
-        callback(foundList);
+        mongoose.connection.close(() => callback(foundList));
       }
+    }
+  });
+};
+
+exports.addItemToList = function(listName, newItem, callback) {
+  openConnection();
+  List.findOne({name: listName}, function(err, foundList) {
+    if (err) {
+      console.log(err);
+      mongoose.connection.close(() => callback());
+    } else if (foundList && newItem) {
+      foundList.items.push(newItem);
+      foundList.save(function() {
+        mongoose.connection.close(() => callback());
+      });
     }
   });
 };
 
 function openConnection() {
   mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true });
-}
-
-function closeConnection(err) {
-  if (err) {
-    console.log(err)
-  }
-  mongoose.connection.close();
 }
