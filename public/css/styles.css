@@ -1,62 +1,24 @@
-html {
-  background-color: #E4E9FD;
-  font-family: 'Arial';
+.list-group {
+  margin-top: 20px;
 }
 
-#heading {
-  text-align: center;
-}
-
-#heading.todo {
-  background-color: #808080;
-}
-
-#heading.done {
-  background-color: green;
-}
-
-#heading > h1 {
-  color: #fff;
-  padding: 10px;
-  font-size: 1.5rem;
-}
-
-
-.item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.list {
+.add-form {
+  margin-top: 20px;
   margin-bottom: 20px;
 }
 
-input:checked+p {
-  text-decoration: line-through;
-  text-decoration-color: #A683E3;
-}
-
-input[type="checkbox"] {
-  margin: 20px;
-}
-
-p {
-  margin: 0;
-  font-size: 20px;
-  font-weight: 200;
-  color: #00204a;
+.todo-text {
   width: 100%;
 }
 
-form.item {
-  text-align: center;
-  margin-left: 20px;
+button.add {
+  color: green;
+  margin-right: 10px;
 }
 
-form.delete {
-  margin-left: 20px;
-  margin-right: 20px;
+button.delete {
+	color: lightgray;
+  margin-left: 10px;
 }
 
 button.btn-no-outline {
@@ -66,32 +28,4 @@ button.btn-no-outline {
 	font: inherit;
 	cursor: pointer;
 	outline: inherit;
-}
-
-button.delete {
-	color: lightgray;
-}
-
-button.add {
-  color: #808080;
-  font-size: 1.5rem;
-}
-
-input[type="text"] {
-  height: 60px;
-  top: 10px;
-  border: none;
-  background: transparent;
-  font-size: 20px;
-  font-weight: 200;
-}
-
-input[type="text"]:focus {
-  outline: none;
-  box-shadow: inset 0 -3px 0 0 #A683E3;
-}
-
-::placeholder {
-  color: grey;
-  opacity: 1;
 }

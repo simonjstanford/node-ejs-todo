@@ -38,7 +38,7 @@ app.post("/", function(req, res) {
 });
 
 app.post("/done", function(req, res) {
-  let newItemId = req.body.checkbox;
+  let newItemId = req.body.button;
   persistence.markAsDone(newItemId, () => res.redirect("/"));
 });
 
@@ -50,14 +50,14 @@ app.post("/delete", function(req, res) {
 app.get("/lists/:customListName", function(req, res) {
   let listName = req.params.customListName;
   let list = persistence.createList(listName, defaults);
-  persistence.addList(list, function(addedList) { 
+  persistence.addList(list, function(addedList) {
     res.render("list", { todoList: addedList, doneList:undefined, postAction: "/lists/" + listName})
   });
 });
 
 app.post("/lists/:customListName", function(req, res) {
   let listName = req.params.customListName;
-  let newItemName = req.body.newTodo;  
+  let newItemName = req.body.newTodo;
   let newItem = persistence.createItem(newItemName);
   persistence.addItemToList(listName, newItem, function() {
      res.redirect("/lists/" + listName)
