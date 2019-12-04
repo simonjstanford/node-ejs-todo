@@ -51,7 +51,16 @@ app.get("/lists/:customListName", function(req, res) {
   let listName = req.params.customListName;
   let list = persistence.createList(listName, defaults);
   persistence.addList(list, function(addedList) {
-    res.render("list", { todoList: addedList, doneList:undefined, postAction: "/lists/" + listName})
+    let todo = {
+      name: "To Do",
+      items: addedList.items.filter(item => !item.done),
+    }
+  
+    let done = {
+      name: "Done",
+      items: addedList.items.filter(item => item.done),
+    }
+    res.render("list", { todoList: todo, doneList:done, postAction: "/lists/" + listName + "/"})
   });
 });
 
@@ -62,6 +71,18 @@ app.post("/lists/:customListName", function(req, res) {
   persistence.addItemToList(listName, newItem, function() {
      res.redirect("/lists/" + listName)
   });
+});
+
+app.post("/lists/:customListName/done", function(req, res) {
+  let listName = req.params.customListName;
+  let newItemId = req.body.button;
+  persistence.markItemInListAsDone(listName, newItemId, () => res.redirect("/lists/" + listName));
+});
+
+app.post("/lists/:customListName/delete", function(req, res) {
+  let listName = req.params.customListName;
+  let newItemId = req.body.button;
+  persistence.removeItemInList(listName, newItemId, () => res.redirect("/lists/" + listName));
 });
 
 app.get("/about", function(req, res) {

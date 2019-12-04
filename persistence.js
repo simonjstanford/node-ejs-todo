@@ -90,6 +90,16 @@ exports.markAsDone = function(itemId, callback) {
   });
 };
 
+exports.markItemInListAsDone = function(listName, itemId, callback) {
+  openConnection();
+  List.findOneAndUpdate({name: listName, "items._id" : itemId}, {"items.$.done" : true}, {useFindAndModifyOption: false}, function(err) {
+    if (err) {
+      console.log(err)
+    }
+    mongoose.connection.close(() => callback());
+  });
+};
+
 exports.removeItem = function(itemId, callback) {
   openConnection();
   console.log("Removing item: ");
@@ -100,6 +110,22 @@ exports.removeItem = function(itemId, callback) {
       console.log(err)
     }
     mongoose.connection.close(() => callback());
+  });
+};
+
+
+exports.removeItemInList = function(listName, itemId, callback) {
+  openConnection();
+  List.findOne({name: listName}, function(err, foundList) {
+    if (err) {
+      console.log(err);
+      mongoose.connection.close(() => callback());
+    } else if (foundList && itemId) {
+      foundList.items.pull(itemId);
+      foundList.save(function() {
+        mongoose.connection.close(() => callback());
+      });
+    }
   });
 };
 
