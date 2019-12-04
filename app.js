@@ -1,8 +1,8 @@
 require('dotenv').config();
 const express = require("express");
 const bodyParser = require("body-parser");
-const mongoose = require("mongoose");
 const persistence = require("./persistence.js");
+const _ = require("lodash");
 
 const app = express();
 app.set("view engine", "ejs");
@@ -66,7 +66,7 @@ app.get("/lists/:customListName", function(req, res) {
 
 app.post("/lists/:customListName", function(req, res) {
   let listName = req.params.customListName;
-  let newItemName = req.body.newTodo;
+  let newItemName = _.capitalize(req.body.newTodo);
   let newItem = persistence.createItem(newItemName);
   persistence.addItemToList(listName, newItem, function() {
      res.redirect("/lists/" + listName)

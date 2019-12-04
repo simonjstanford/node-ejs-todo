@@ -113,6 +113,15 @@ exports.removeItem = function(itemId, callback) {
   });
 };
 
+exports.removeItemInList = function(listName, itemId, callback) {
+  openConnection();
+  List.findOneAndUpdate({name: listName}, {$pull: {items: {_id: itemId}}}, {useFindAndModifyOption: false}, function(err) {
+    if (err) {
+      console.log(err)
+    }
+    mongoose.connection.close(() => callback());
+  });
+};
 
 exports.removeItemInList = function(listName, itemId, callback) {
   openConnection();
