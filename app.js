@@ -1,93 +1,22 @@
 require('dotenv').config();
 const express = require("express");
 const bodyParser = require("body-parser");
-const persistence = require("./persistence.js");
-const _ = require("lodash");
+const routes = require("./routes");
 
 const app = express();
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static("public"));
 
-let item1 = persistence.createItem("Welcome to your todo list!");
-let item2 = persistence.createItem("Hit the + button to add a new item.");
-let item3 = persistence.createItem("<-- Hit this to mark as done.");
-let item4 = persistence.createItem("Hit the bin to delete an item.");
-let defaults = [item1, item2, item3, item4];
+app.get("/", routes.todo.getAllToDo);
+app.post("/", routes.todo.postNewToDo);
+app.post("/done", routes.todo.markToDoAsDone);
+app.post("/delete", routes.todo.deleteToDo);
 
-app.get("/", function(req, res) {
-  persistence.getItems(defaults, (todoItems) => {
-    let todo = {
-      name: "To Do",
-      items: todoItems.filter(item => !item.done),
-    }
-
-    let done = {
-      name: "Done",
-      items: todoItems.filter(item => item.done),
-    }
-
-    res.render("list", { todoList: todo, doneList: done, postAction: "/"});
-  });
-});
-
-app.post("/", function(req, res) {
-  let newItemName = req.body.newTodo;
-  let newItem = persistence.createItem(newItemName);
-  persistence.addItems(newItem, () => res.redirect("/"));
-});
-
-app.post("/done", function(req, res) {
-  let newItemId = req.body.button;
-  persistence.markAsDone(newItemId, () => res.redirect("/"));
-});
-
-app.post("/delete", function(req, res) {
-  let newItemId = req.body.button;
-  persistence.removeItem(newItemId, () => res.redirect("/"));
-});
-
-app.get("/lists/:customListName", function(req, res) {
-  let listName = req.params.customListName;
-  let list = persistence.createList(listName, defaults);
-  persistence.addList(list, function(addedList) {
-    let todo = {
-      name: "To Do",
-      items: addedList.items.filter(item => !item.done),
-    }
-  
-    let done = {
-      name: "Done",
-      items: addedList.items.filter(item => item.done),
-    }
-    res.render("list", { todoList: todo, doneList:done, postAction: "/lists/" + listName + "/"})
-  });
-});
-
-app.post("/lists/:customListName", function(req, res) {
-  let listName = req.params.customListName;
-  let newItemName = _.capitalize(req.body.newTodo);
-  let newItem = persistence.createItem(newItemName);
-  persistence.addItemToList(listName, newItem, function() {
-     res.redirect("/lists/" + listName)
-  });
-});
-
-app.post("/lists/:customListName/done", function(req, res) {
-  let listName = req.params.customListName;
-  let newItemId = req.body.button;
-  persistence.markItemInListAsDone(listName, newItemId, () => res.redirect("/lists/" + listName));
-});
-
-app.post("/lists/:customListName/delete", function(req, res) {
-  let listName = req.params.customListName;
-  let newItemId = req.body.button;
-  persistence.removeItemInList(listName, newItemId, () => res.redirect("/lists/" + listName));
-});
-
-app.get("/about", function(req, res) {
-  res.render("about");
-});
+app.get("/lists/:customListName", routes.customLists.getList);
+app.post("/lists/:customListName", routes.customLists.postNewToDo);
+app.post("/lists/:customListName/done", routes.customLists.markToDoAsDone);
+app.post("/lists/:customListName/delete", routes.customLists.deleteToDo);
 
 app.listen(process.env.PORT || 3000, function() {
   console.log("Server started on port " + (process.env.PORT || 3000));
